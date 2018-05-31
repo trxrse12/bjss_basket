@@ -14,12 +14,15 @@ const currency = {
     USD:"USD"
 };
 
-const basket = {
-    subtotal:0,
-    discounts:[{}],
-    discountAmt:0,
-    total:2.34
-};
+let calculator = function(items,currency){
+    return {
+        subtotal: 10,
+        discounts: ["Apples 10% off"],
+        discountAmt: 5,
+        total:230,
+        currency: "GBP"
+    }
+}
 
 exports.list_products = (req,res) => {
     res.status(200).json(goods);
@@ -30,5 +33,11 @@ exports.list_currencies = (req,res) => {
 };
 
 exports.calculate_basket = (req,res) => {
-    res.status(200).json(basket);
+    if (req.body.items && req.body.currency){
+        let my_basket = calculator(req.body.items, req.body.currency);
+        res.status(200).json(my_basket);
+    }
+    else {
+        res.status(400).json({msg:"Bad Request"})
+    }
 };
