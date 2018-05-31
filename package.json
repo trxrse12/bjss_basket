@@ -1,0 +1,20 @@
+{
+  "name": "basket",
+  "version": "1.0.0",
+  "description": "API that prices a basket of goods in selected currency, accounting for special offers",
+  "main": "/app/app.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Remus Sepp",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3",
+    "http": "0.0.0",
+    "path": "^0.12.7"
+  }
+}
