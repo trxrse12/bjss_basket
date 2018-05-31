@@ -8,28 +8,37 @@ const goods = {
     Apples: 1.00
 };
 
-const currency = {
+const currency_list = {
     EUR:"EUR",
     GBP:"GBP",
     USD:"USD"
 };
 
+function getExchangeRate(currency){
+    return 1
+}
+
 let calculator = function(items,currency){
+    let exchange_rate = getExchangeRate(currency);
+    let subtotal = 0;
+    for (const item in items){
+        subtotal += items[item] * goods[item] * exchange_rate;
+    }
     return {
-        subtotal: 10,
+        subtotal: subtotal,
         discounts: ["Apples 10% off"],
         discountAmt: 5,
         total:230,
         currency: "GBP"
     }
-}
+};
 
 exports.list_products = (req,res) => {
     res.status(200).json(goods);
 };
 
 exports.list_currencies = (req,res) => {
-    res.status(200).json(currency);
+    res.status(200).json(currency_list);
 };
 
 exports.calculate_basket = (req,res) => {
