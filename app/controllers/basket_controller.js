@@ -14,10 +14,17 @@ const currency = {
     USD:"USD"
 };
 
+const basket = {
+    subtotal:0,
+    discounts:[{}],
+    discountAmt:0,
+    total:2.34
+}
+
 exports.list_products = (req,res) => {
     res.status(200).json(goods);
 };
 
-exports.show_currency = (req,res) => {
+exports.list_currencies = (req,res) => {
     res.status(200).json(currency);
 }
