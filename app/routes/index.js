@@ -8,5 +8,6 @@ const basket_controller = require('../controllers/basket_controller');
 
 router.get('/products',basket_controller.list_products);
 router.get('/currencies',basket_controller.list_currencies);
+router.post('/basket',basket_controller.calculate_basket);
 
 module.exports = router;

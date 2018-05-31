@@ -19,7 +19,7 @@ const basket = {
     discounts:[{}],
     discountAmt:0,
     total:2.34
-}
+};
 
 exports.list_products = (req,res) => {
     res.status(200).json(goods);
@@ -27,4 +27,8 @@ exports.list_products = (req,res) => {
 
 exports.list_currencies = (req,res) => {
     res.status(200).json(currency);
-}
+};
+
+exports.calculate_basket = (req,res) => {
+    res.status(200).json(basket);
+};
