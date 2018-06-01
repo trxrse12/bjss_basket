@@ -33,10 +33,6 @@ app.use(function(req, res, next) {
 
 
 
-
-
-
-
 // start the node_ctex server
 const server = require('./server')(app);
 

@@ -94,6 +94,39 @@ context('\n\n\n\n\n\n\n\n ===>>>: TESTING THE Basket API:',function(){
                 })
             });
 
+            it("TEST 1.5 (POST /basket) >>> should retrieve empty results if products not on the list",function(done){
+                superagent.post('http://localhost:3000/api/v1.0/basket').query({
+                    items:'Bananas , Oranges',
+                    currency: 'GBP'
+                })
+                .end(function(err,res){
+
+                    expect(res).to.exist;
+                    console.log("\n       <<< Test 1.5 result (POST 201 /basket) server says: " + JSON.stringify(res.body));
+                    console.log("       <<< Test 1.5 res.status: ", res.status);
+                    expect(res.status).to.eql(200);
+                    expect('Content-Type', /json/);
+                    res.body.subtotal.should.be.closeTo(0,0); // excluding discount
+                    res.body.discountAmt.should.be.closeTo(0,0); // 0.01 to consider the rounding errors from currency exchange
+                    res.body.total.should.be.closeTo(0,0); // including discount
+
+                    res.body.should.have.a.property('discounts');
+                    res.body.discounts.should.be.an('string');
+
+                    res.body.should.have.a.property('discountAmt');
+                    res.body.discountAmt.should.be.a('number');
+                    res.body.discountAmt.should.be.at.least(0);
+
+                    res.body.should.have.a.property('total');
+                    res.body.total.should.be.a('number');
+
+                    res.body.should.have.a.property('currency');
+                    res.body.currency.should.be.a('string');
+                    res.body.currency.should.match(/GBP|EUR|USD/);
+                    done();
+                })
+            });
+
             it("TEST 1.3 (POST /basket) >>> should retrieve the cost of associated basket",function(done){
                 superagent.post('http://localhost:3000/api/v1.0/basket').query({
                         items:itemsString,

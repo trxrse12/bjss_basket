@@ -2,9 +2,9 @@
  * Created by Remus on 31/05/2018
  */
 const request = require('request-promise');
-const api_key = "27bb418dc482d879cf6757facad81c45";
+const api_key = "27bb418dc482d879cf6757facad81c45"; // can be saved to a file and secured
 
-
+// unit price array ==> can be further extended to get it from a separate file or database
 const unitPrice = {
     Soup: 0.65,
     Bread: 0.80,
@@ -43,7 +43,7 @@ function calculate_discount(item,ordered_qty){
 }
 
 
-
+// promise-based calculator
 let calculator = function(items,currency){
     return new Promise((resolve,reject) => {
         let result = request({
@@ -55,14 +55,14 @@ let calculator = function(items,currency){
                 return response.quotes;
             })
             .then(exchange_rates => {
-                let total = 0;
-                let subtotal = 0;
-                let itemsArray = items.split(',').map(s => s.trim()); // from string to clean array of strings
+                let total = 0; // value after discount (before applying exchange rate)
+                let subtotal = 0; // value before discount (before applying exchange rate)
+                let itemsArray = items.split(',').map(s => s.trim()); // from string (req.query.items) to clean array of strings
                 let discountPerItem = 0;
                 let discountsReport = "";
                 let totalDiscount = 0;
 
-                let exchange_rate = exchange_rates["USD"+currency] || 0;
+                let exchange_rate = exchange_rates["USD"+currency] || 0; // any web currency exchange API error will blank all outputs
 
                 // transform the input string into a map
                 let itemsMap = new Map();
@@ -74,6 +74,8 @@ let calculator = function(items,currency){
                     }
                 }
 
+                // apply discounts, create discount report and calculate subtotals and total discount (before applying exchange rate)
+                // TODO: can be extracted into a separate function (refactoring)
                 itemsMap.forEach((ordered_qty,item) => {
                     if (unitPrice[item]){ // for each VALID product in the basket
                         discountPerItem = calculate_discount(item,ordered_qty);
@@ -86,7 +88,7 @@ let calculator = function(items,currency){
                 });
 
                 total += subtotal - totalDiscount;
-
+                // returns the results
                 resolve({
                     subtotal: round2decimals(subtotal * exchange_rate),
                     discounts: discountsReport ,
@@ -113,13 +115,14 @@ exports.list_currencies = (req,res) => {
     res.status(200).json(currency_list);
 };
 
-
+//promise-based module export
 exports.calculate_basket = function(req,res){
     return new Promise((resolve,reject) => {
         if (req.query.items && req.query.currency && currency_list[req.query.currency]) {
+            // promise-based calculator function, will return the basket json when the currency exchange web API answers
             calculator(req.query.items, req.query.currency)
                 .then(my_basket => {
-                    res.status(200).json(my_basket);
+                    res.status(200).json(my_basket); // as per the requirements spec
                     resolve("Ok");
                 });
         }
