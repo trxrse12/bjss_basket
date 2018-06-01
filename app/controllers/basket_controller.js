@@ -12,29 +12,21 @@ const unitPrice = {
     Apples: 1.00
 };
 
+// discount array ==> can be further extended to get it from a separate file or database
 const specialOffers = {
     Milk: {discount_qty: 3,
-            discount_amt: 0.5}, // 50%
+            discount_amt: 0.5}, // 0.5 price units
     Apples: {discount_qty:1,
             discount_amt: "10%"} // 10%
 };
 
+// allowed currencies list ==> can be further extended to get them from a separate file or database
 const currency_list = {
     EUR:"EUR",
     GBP:"GBP",
     USD:"USD"
 };
 
-function getExchangeRate(currency){
-    let result = request({
-        "method":"GET",
-        "uri":"http://apilayer.net/api/live?access_key=" + api_key + "&currencies=EUR,GBP",
-        "json":true
-    })
-    .then(function(response){
-        return response.quotes.USDEUR;
-    });
-}
 
 function calculate_discount(item,ordered_qty){
     let discountedItem = "";
@@ -70,7 +62,6 @@ let calculator = function(items,currency){
                 let discountsReport = "";
                 let totalDiscount = 0;
 
-                console.log(exchange_rates);
                 let exchange_rate = exchange_rates["USD"+currency] || 0;
 
                 // transform the input string into a map
@@ -97,10 +88,10 @@ let calculator = function(items,currency){
                 total += subtotal - totalDiscount;
 
                 resolve({
-                    subtotal: subtotal * exchange_rate,
+                    subtotal: round2decimals(subtotal * exchange_rate),
                     discounts: discountsReport ,
-                    discountAmt: totalDiscount * exchange_rate,
-                    total:total * exchange_rate,
+                    discountAmt: round2decimals(totalDiscount * exchange_rate),
+                    total: round2decimals(total * exchange_rate),
                     currency: currency
                 })
             })
@@ -108,9 +99,11 @@ let calculator = function(items,currency){
             console.log('Error:',err)
         })
     });
-
-
 };
+
+function round2decimals(my_num){
+    return Number(my_num.toFixed(2));
+}
 
 exports.list_products = (req,res) => {
     res.status(200).json(unitPrice);

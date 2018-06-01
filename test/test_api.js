@@ -117,12 +117,14 @@ context('\n\n\n\n\n\n\n\n ===>>>: TESTING THE Basket API:',function(){
                     let total_soup = soup * unitPrice.Soup;
                     let subtotal = (total_apples + total_milk + total_soup)*currency;
 
+                    console.log("testing subtotal:",subtotal);
+
                     let discount_apples = apples * 0.1 * currency;
                     let discount_milk = Math.floor(milk  / specialOffers.Milk.discount_qty) * specialOffers.Milk.discount_amt * currency;
                     let total_discount = (discount_apples + discount_milk);
 
                     res.body.subtotal.should.be.closeTo(subtotal,0.01); // excluding discount
-                    res.body.discountAmt.should.be.closeTo(total_discount,0.01);
+                    res.body.discountAmt.should.be.closeTo(total_discount,0.01); // 0.01 to consider the rounding errors from currency exchange
                     res.body.total.should.be.closeTo(subtotal - total_discount,0.01); // including discount
 
                     res.body.should.have.a.property('discounts');
