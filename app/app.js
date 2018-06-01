@@ -2,11 +2,11 @@
  * Created by Remus on 31/05/2018
  */
 
-var express = require('express');
-var app = express();
+const express = require('express');
+const app = express();
 const index = require('./routes/index');
 
-var bodyParser = require('body-parser');
+const bodyParser = require('body-parser');
 
 
 
@@ -38,7 +38,7 @@ app.use(function(req, res, next) {
 
 
 // start the node_ctex server
-var server = require('./server')(app);
+const server = require('./server')(app);
 
 
 module.exports = app;

@@ -8,6 +8,10 @@ var chai = require('chai'),
     expect = chai.expect;
 var superagent = require('superagent');
 
+const request = require('request-promise');
+const api_key = "27bb418dc482d879cf6757facad81c45";
+
+
 const unitPrice = {
     Soup: 0.65,
     Bread: 0.80,
@@ -122,4 +126,18 @@ context('\n\n\n\n\n\n\n\n ===>>>: TESTING THE Basket API:',function(){
                 })
             })
         });
+
+        describe('\n\n CONTEXT 4: When hit by API request (GET), the LIVE CURRENCY API: ', function(){
+            it("TEST 1.5 (GET) >>> should retrieve the list of currency rates",function(done){
+                let response = request({
+                          "method":"GET",
+                          "uri":"http://apilayer.net/api/live?access_key=" + api_key + "&currencies=EUR,GBP",
+                          "json":true
+                      })
+                    .then(function(response){
+                        console.log(response);
+                        done()
+                    });
+            })
+        })
 });

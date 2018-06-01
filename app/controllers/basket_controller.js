@@ -1,6 +1,10 @@
 /**
  * Created by Remus on 31/05/2018
  */
+const request = require('request-promise');
+const api_key = "27bb418dc482d879cf6757facad81c45";
+
+
 const unitPrice = {
     Soup: 0.65,
     Bread: 0.80,
@@ -22,10 +26,18 @@ const currency_list = {
 };
 
 function getExchangeRate(currency){
-    return 2
+    let result = request({
+        "method":"GET",
+        "uri":"http://apilayer.net/api/live?access_key=" + api_key + "&currencies=EUR,GBP",
+        "json":true
+    })
+    .then(function(response){
+        console.log('KKKKKKKKKKKKKKKKKKKKKKKKKKKK exchange_rate=',response.quotes.USDEUR);
+        return response.quotes.USDEUR;
+    });
 }
 
-function calculate_discount(item,ordered_qty,currency){
+function calculate_discount(item,ordered_qty){
     let discountedItem = "";
     discountedItem = specialOffers[item] || ""; // any discount for it???
 
@@ -90,12 +102,16 @@ exports.list_currencies = (req,res) => {
     res.status(200).json(currency_list);
 };
 
-exports.calculate_basket = (req,res) => {
-    if (req.query.items && req.query.currency && currency_list[req.query.currency]){
-        let my_basket = calculator(req.query.items, req.query.currency);
-        res.status(200).json(my_basket);
-    }
-    else {
-        res.status(400).json({msg:"Bad Request"})
-    }
+
+exports.calculate_basket = function(req,res){
+    return new Promise((resolve,reject) => {
+        if (req.query.items && req.query.currency && currency_list[req.query.currency]) {
+            let my_basket = calculator(req.query.items, req.query.currency);
+            resolve(res.status(200).json(my_basket));
+        }
+        else {
+            reject(res.status(400).json({msg: "Bad Request"}));
+        }
+    });
 };
+
