@@ -75,10 +75,10 @@ let calculator = function(items,currency){
 
     return {
         subtotal: subtotal * exchange_rate,
-        discounts: discountsReport * exchange_rate,
+        discounts: discountsReport ,
         discountAmt: totalDiscount * exchange_rate,
         total:total * exchange_rate,
-        currency: "GBP"
+        currency: currency
     }
 };
 
