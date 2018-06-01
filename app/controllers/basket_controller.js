@@ -91,7 +91,7 @@ exports.list_currencies = (req,res) => {
 };
 
 exports.calculate_basket = (req,res) => {
-    if (req.query.items && req.query.currency){
+    if (req.query.items && req.query.currency && currency_list[req.query.currency]){
         let my_basket = calculator(req.query.items, req.query.currency);
         res.status(200).json(my_basket);
     }

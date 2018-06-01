@@ -50,14 +50,31 @@ context('\n\n\n\n\n\n\n\n ===>>>: TESTING THE Basket API:',function(){
         });
 
         describe('\n\n CONTEXT 3: When hit by API request (POST /basket), the Basket API: ', function(){
+            let apples = 3;
+            let milk = 4;
+            let soup = 1;
+
+            let itemsString = "Apples, ".repeat(apples) + "Milk, ".repeat(milk) + "Soup, ".repeat(soup);
+            itemsString = itemsString.slice(0,-1); // cut the last ","
+
+            it("TEST 1.4 (POST /basket) >>> should retrieve 'Bad Request' if currency incorrect",function(done){
+                superagent.post('http://localhost:3000/api/v1.0/basket').query({
+                    items:itemsString,
+                    currency: 'DDD'
+                })
+                .end(function(err,res){
+                    expect(res).to.exist;
+                    console.log("\n       <<< Test 1.4 result (POST 201 /basket) server says: " + JSON.stringify(res.body));
+                    console.log("       <<< Test 1.4 res.status: ", res.status);
+                    expect(res.status).to.eql(400);
+                    expect('Content-Type', /json/);
+                    res.body.should.be.an('object');
+                    res.body.msg.should.match(/Bad Request/);
+                    done();
+                })
+            });
+
             it("TEST 1.3 (POST /basket) >>> should retrieve the cost of associated basket",function(done){
-                let apples = 3;
-                let milk = 4;
-                let soup = 1;
-
-                let itemsString = "Apples, ".repeat(apples) + "Milk, ".repeat(milk) + "Soup, ".repeat(soup);
-                itemsString = itemsString.slice(0,-1); // cut the last ","
-
                 superagent.post('http://localhost:3000/api/v1.0/basket').query({
                         items:itemsString,
                         currency: 'EUR'
