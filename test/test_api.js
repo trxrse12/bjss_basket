@@ -53,10 +53,11 @@ context('\n\n\n\n\n\n\n\n ===>>>: TESTING THE Basket API:',function(){
                     res.body.should.have.a.property('subtotal');
                     res.body.subtotal.should.be.a('number');
                     res.body.subtotal.should.be.at.least(0);
-                    res.body.subtotal.should.be.closeTo(14.9,0.01); // including discount
+                    res.body.subtotal.should.be.closeTo(16.5,0.01); // excluding discount
+                    res.body.total.should.be.closeTo(14.9,0.01); // including discount
 
                     res.body.should.have.a.property('discounts');
-                    res.body.discounts.should.be.an('array');
+                    res.body.discounts.should.be.an('string');
 
                     res.body.should.have.a.property('discountAmt');
                     res.body.discountAmt.should.be.a('number');

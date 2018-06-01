@@ -44,9 +44,12 @@ function calculate_discount(item,ordered_qty,currency){
 
 let calculator = function(items,currency){
     let exchange_rate = getExchangeRate(currency);
+    let total = 0;
     let subtotal = 0;
     let itemsArray = items.split(',').map(s => s.trim()); // from string to clean array of strings
     let discountPerItem = 0;
+    let discountsReport = "";
+    let totalDiscount = 0;
 
     // transform the input string into a map
     let itemsMap = new Map();
@@ -61,15 +64,21 @@ let calculator = function(items,currency){
     itemsMap.forEach((ordered_qty,item) => {
         if (unitPrice[item]){ // for each VALID product in the basket
             discountPerItem = calculate_discount(item,ordered_qty);
-            subtotal += ordered_qty * unitPrice[item] * exchange_rate - discountPerItem;
+            if (discountPerItem>0){
+                discountsReport += " " + item + ":" + specialOffers[item].discount_qty + " >>> "  + specialOffers[item].discount_amt + ";";
+            }
+            subtotal += ordered_qty * unitPrice[item] * exchange_rate;
+            totalDiscount += discountPerItem;
         }
     });
 
+    total += subtotal - totalDiscount;
+
     return {
         subtotal: subtotal,
-        discounts: ["Apples 10% off"],
-        discountAmt: 5,
-        total:230,
+        discounts: discountsReport,
+        discountAmt: totalDiscount,
+        total:total,
         currency: "GBP"
     }
 };
