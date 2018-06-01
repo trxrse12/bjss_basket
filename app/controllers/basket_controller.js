@@ -54,22 +54,24 @@ function calculate_discount(item,ordered_qty){
 
 let calculator = function(items,currency){
     return new Promise((resolve,reject) => {
-        //let exchange_rate = getExchangeRate(currency)
         let result = request({
             "method":"GET",
             "uri":"http://apilayer.net/api/live?access_key=" + api_key + "&currencies=EUR,GBP",
             "json":true
         })
             .then(function(response){
-                return response.quotes.USDEUR;
+                return response.quotes;
             })
-            .then(exchange_rate => {
+            .then(exchange_rates => {
                 let total = 0;
                 let subtotal = 0;
                 let itemsArray = items.split(',').map(s => s.trim()); // from string to clean array of strings
                 let discountPerItem = 0;
                 let discountsReport = "";
                 let totalDiscount = 0;
+
+                console.log(exchange_rates);
+                let exchange_rate = exchange_rates["USD"+currency] || 0;
 
                 // transform the input string into a map
                 let itemsMap = new Map();

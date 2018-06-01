@@ -26,7 +26,23 @@ const specialOffers = {
         discount_amt: "10%"} // 10%
 };
 
-const currency = 0.857204;
+const currency_type = "EUR";
+let currency = 0;
+
+before('\n\n CONTEXT 4: When hit by API request (GET), the LIVE CURRENCY API: ', function(done) {
+    let response = request({
+        "method": "GET",
+        "uri": "http://apilayer.net/api/live?access_key=" + api_key + "&currencies=EUR,GBP",
+        "json": true
+    })
+        .then(function (response) {
+            console.log(response.quotes["USD" + currency_type]);
+            currency = response.quotes["USD" + currency_type];
+            console.log("Testing using currency conversion rate: ", currency);
+            done()
+        });
+});
+
 
 context('\n\n\n\n\n\n\n\n ===>>>: TESTING THE Basket API:',function(){
         describe('\n\n CONTEXT 1: When hit by API request (GET /products), the Basket API: ', function() {
@@ -81,7 +97,7 @@ context('\n\n\n\n\n\n\n\n ===>>>: TESTING THE Basket API:',function(){
             it("TEST 1.3 (POST /basket) >>> should retrieve the cost of associated basket",function(done){
                 superagent.post('http://localhost:3000/api/v1.0/basket').query({
                         items:itemsString,
-                        currency: 'EUR'
+                        currency: currency_type
                 })
                 .end(function(err,res){
                     expect(res).to.exist;
@@ -127,17 +143,4 @@ context('\n\n\n\n\n\n\n\n ===>>>: TESTING THE Basket API:',function(){
             })
         });
 
-        describe('\n\n CONTEXT 4: When hit by API request (GET), the LIVE CURRENCY API: ', function(){
-            it("TEST 1.5 (GET) >>> should retrieve the list of currency rates",function(done){
-                let response = request({
-                          "method":"GET",
-                          "uri":"http://apilayer.net/api/live?access_key=" + api_key + "&currencies=EUR,GBP",
-                          "json":true
-                      })
-                    .then(function(response){
-                        console.log(response);
-                        done()
-                    });
-            })
-        })
 });
