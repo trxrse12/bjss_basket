@@ -10,9 +10,9 @@ const unitPrice = {
 
 const specialOffers = {
     Milk: {discount_qty: 3,
-            discount_amt: 0.5},
+            discount_amt: 0.5}, // 50%
     Apples: {discount_qty:1,
-            dicount_amt: "10%"}
+            discount_amt: "10%"} // 10%
 };
 
 const currency_list = {
@@ -25,15 +25,46 @@ function getExchangeRate(currency){
     return 2
 }
 
+function calculate_discount(item,ordered_qty,currency){
+    let discountedItem = "";
+    let exchange_rate_discount = getExchangeRate(currency);
+    discountedItem = specialOffers[item] || ""; // any discount for it???
+
+    if (discountedItem && ordered_qty>=discountedItem.discount_qty) { // if the ordered qty >= min qty needed for discount
+        // two different cases: the discount is a percentage or an absolute value
+        let discountIfPercentage = (unitPrice[item]*Math.floor(ordered_qty/discountedItem.discount_qty) * parseFloat(discountedItem.discount_amt)/100) * exchange_rate_discount;
+        let discountIfAbsolute =  (Math.floor(ordered_qty/discountedItem.discount_qty)*parseFloat(discountedItem.discount_amt)) * exchange_rate_discount;
+        return /\%/.test(discountedItem.discount_amt) ? discountIfPercentage : discountIfAbsolute;
+    } else {
+        return 0;
+    }
+}
+
+
+
 let calculator = function(items,currency){
     let exchange_rate = getExchangeRate(currency);
     let subtotal = 0;
     let itemsArray = items.split(',').map(s => s.trim()); // from string to clean array of strings
+    let discountPerItem = 0;
+
+    // transform the input string into a map
+    let itemsMap = new Map();
     for (item of itemsArray){
-        if (unitPrice[item]){
-            subtotal += unitPrice[item] * exchange_rate;
+        if (itemsMap.get(item)){
+            itemsMap.set(item,itemsMap.get(item)+1);
+        } else {
+            itemsMap.set(item,1);
         }
     }
+
+    itemsMap.forEach((ordered_qty,item) => {
+        if (unitPrice[item]){ // for each VALID product in the basket
+            discountPerItem = calculate_discount(item,ordered_qty);
+            subtotal += ordered_qty * unitPrice[item] * exchange_rate - discountPerItem;
+        }
+    });
+
     return {
         subtotal: subtotal,
         discounts: ["Apples 10% off"],
