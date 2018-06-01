@@ -51,9 +51,9 @@ context('\n\n\n\n\n\n\n\n ===>>>: TESTING THE Basket API:',function(){
 
         describe('\n\n CONTEXT 3: When hit by API request (POST /basket), the Basket API: ', function(){
             it("TEST 1.3 (POST /basket) >>> should retrieve the cost of associated basket",function(done){
-                let apples = 30;
-                let milk = 40;
-                let soup = 10;
+                let apples = 3;
+                let milk = 4;
+                let soup = 1;
 
                 let itemsString = "Apples, ".repeat(apples) + "Milk, ".repeat(milk) + "Soup, ".repeat(soup);
                 itemsString = itemsString.slice(0,-1); // cut the last ","

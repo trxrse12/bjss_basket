@@ -27,13 +27,12 @@ function getExchangeRate(currency){
 
 function calculate_discount(item,ordered_qty,currency){
     let discountedItem = "";
-    let exchange_rate_discount = getExchangeRate(currency);
     discountedItem = specialOffers[item] || ""; // any discount for it???
 
     if (discountedItem && ordered_qty>=discountedItem.discount_qty) { // if the ordered qty >= min qty needed for discount
         // two different cases: the discount is a percentage or an absolute value
-        let discountIfPercentage = (unitPrice[item]*Math.floor(ordered_qty/discountedItem.discount_qty) * parseFloat(discountedItem.discount_amt)/100) * exchange_rate_discount;
-        let discountIfAbsolute =  (Math.floor(ordered_qty/discountedItem.discount_qty)*parseFloat(discountedItem.discount_amt)) * exchange_rate_discount;
+        let discountIfPercentage = (unitPrice[item]*Math.floor(ordered_qty/discountedItem.discount_qty) * parseFloat(discountedItem.discount_amt)/100) ;
+        let discountIfAbsolute =  (Math.floor(ordered_qty/discountedItem.discount_qty)*parseFloat(discountedItem.discount_amt)) ;
         return /\%/.test(discountedItem.discount_amt) ? discountIfPercentage : discountIfAbsolute;
     } else {
         return 0;
@@ -67,7 +66,7 @@ let calculator = function(items,currency){
             if (discountPerItem>0){
                 discountsReport += " " + item + ":" + specialOffers[item].discount_qty + " >>> "  + specialOffers[item].discount_amt + ";";
             }
-            subtotal += ordered_qty * unitPrice[item] * exchange_rate;
+            subtotal += ordered_qty * unitPrice[item];
             totalDiscount += discountPerItem;
         }
     });
@@ -75,10 +74,10 @@ let calculator = function(items,currency){
     total += subtotal - totalDiscount;
 
     return {
-        subtotal: subtotal,
-        discounts: discountsReport,
-        discountAmt: totalDiscount,
-        total:total,
+        subtotal: subtotal * exchange_rate,
+        discounts: discountsReport * exchange_rate,
+        discountAmt: totalDiscount * exchange_rate,
+        total:total * exchange_rate,
         currency: "GBP"
     }
 };
