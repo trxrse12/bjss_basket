@@ -37,13 +37,9 @@ context('\n\n\n\n\n\n\n\n ===>>>: TESTING THE Basket API:',function(){
 
         describe('\n\n CONTEXT 3: When hit by API request (POST /basket), the Basket API: ', function(){
             it("TEST 1.3 (POST /basket) >>> should retrieve the cost of associated basket",function(done){
-                superagent.post('http://localhost:3000/api/v1.0/basket').send({
-                    items: {
-                        Apples: 100,
-                        Milk: 2,
-                        Soup: 5
-                    },
-                    currency: "EUR"
+                superagent.post('http://localhost:3000/api/v1.0/basket').query({
+                        items:'Apples, Apples, Apples, Milk, Soup',
+                        currency: 'EUR'
                 })
                 .end(function(err,res){
                     expect(res).to.exist;
@@ -57,6 +53,7 @@ context('\n\n\n\n\n\n\n\n ===>>>: TESTING THE Basket API:',function(){
                     res.body.should.have.a.property('subtotal');
                     res.body.subtotal.should.be.a('number');
                     res.body.subtotal.should.be.at.least(0);
+                    res.body.subtotal.should.be.closeTo(9.6,0.01); // not including discount
 
                     res.body.should.have.a.property('discounts');
                     res.body.discounts.should.be.an('array');
