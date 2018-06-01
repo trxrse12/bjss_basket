@@ -51,9 +51,9 @@ context('\n\n\n\n\n\n\n\n ===>>>: TESTING THE Basket API:',function(){
 
         describe('\n\n CONTEXT 3: When hit by API request (POST /basket), the Basket API: ', function(){
             it("TEST 1.3 (POST /basket) >>> should retrieve the cost of associated basket",function(done){
-                let apples = 3;
-                let milk = 4;
-                let soup = 1;
+                let apples = 30;
+                let milk = 40;
+                let soup = 10;
 
                 let itemsString = "Apples, ".repeat(apples) + "Milk, ".repeat(milk) + "Soup, ".repeat(soup);
                 itemsString = itemsString.slice(0,-1); // cut the last ","
@@ -75,13 +75,13 @@ context('\n\n\n\n\n\n\n\n ===>>>: TESTING THE Basket API:',function(){
                     res.body.subtotal.should.be.a('number');
                     res.body.subtotal.should.be.at.least(0);
 
-                    let total_apples = 3 * unitPrice.Apples;
-                    let total_milk = 4 * unitPrice.Milk;
-                    let total_soup = 1 * unitPrice.Soup;
+                    let total_apples = apples * unitPrice.Apples;
+                    let total_milk = milk * unitPrice.Milk;
+                    let total_soup = soup * unitPrice.Soup;
                     let subtotal = (total_apples + total_milk + total_soup)*currency;
 
-                    let discount_apples = 3 * 0.1 * currency;
-                    let discount_milk = Math.floor(4  / specialOffers.Milk.discount_qty) * specialOffers.Milk.discount_amt * currency;
+                    let discount_apples = apples * 0.1 * currency;
+                    let discount_milk = Math.floor(milk  / specialOffers.Milk.discount_qty) * specialOffers.Milk.discount_amt * currency;
                     let total_discount = (discount_apples + discount_milk);
 
                     res.body.subtotal.should.be.closeTo(subtotal,0.01); // excluding discount
