@@ -32,7 +32,6 @@ function getExchangeRate(currency){
         "json":true
     })
     .then(function(response){
-        console.log('KKKKKKKKKKKKKKKKKKKKKKKKKKKK exchange_rate=',response.quotes.USDEUR);
         return response.quotes.USDEUR;
     });
 }
@@ -62,11 +61,9 @@ let calculator = function(items,currency){
             "json":true
         })
             .then(function(response){
-                console.log('KKKKKKKKKKKKKKKKKKKKKKKKKKKK exchange_rate=',response.quotes.USDEUR);
                 return response.quotes.USDEUR;
             })
             .then(exchange_rate => {
-                console.log('TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT exchange_rate=',exchange_rate);
                 let total = 0;
                 let subtotal = 0;
                 let itemsArray = items.split(',').map(s => s.trim()); // from string to clean array of strings
@@ -106,7 +103,7 @@ let calculator = function(items,currency){
                 })
             })
         .catch(err => {
-            console.log('ERRRRRRR:',err)
+            console.log('Error:',err)
         })
     });
 
@@ -127,11 +124,13 @@ exports.calculate_basket = function(req,res){
         if (req.query.items && req.query.currency && currency_list[req.query.currency]) {
             calculator(req.query.items, req.query.currency)
                 .then(my_basket => {
-                    resolve (res.status(200).json(my_basket));
+                    res.status(200).json(my_basket);
+                    resolve("Ok");
                 });
         }
         else {
-            reject(res.status(400).json({msg: "Bad Request"}));
+            res.status(400).json({msg: "Bad Request"});
+            reject("Bad Request");
         }
     });
 };

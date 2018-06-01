@@ -10,6 +10,7 @@ router.get('/products',basket_controller.list_products);
 router.get('/currencies',basket_controller.list_currencies);
 router.post('/basket',(req,res,next) => {
     basket_controller.calculate_basket (req,res)
+        .then(result => console.log(result))
         .catch(err => console.log(err))
 });
 
