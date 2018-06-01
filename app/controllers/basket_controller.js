@@ -54,44 +54,63 @@ function calculate_discount(item,ordered_qty){
 
 
 let calculator = function(items,currency){
-    let exchange_rate = getExchangeRate(currency);
-    let total = 0;
-    let subtotal = 0;
-    let itemsArray = items.split(',').map(s => s.trim()); // from string to clean array of strings
-    let discountPerItem = 0;
-    let discountsReport = "";
-    let totalDiscount = 0;
+    return new Promise((resolve,reject) => {
+        //let exchange_rate = getExchangeRate(currency)
+        let result = request({
+            "method":"GET",
+            "uri":"http://apilayer.net/api/live?access_key=" + api_key + "&currencies=EUR,GBP",
+            "json":true
+        })
+            .then(function(response){
+                console.log('KKKKKKKKKKKKKKKKKKKKKKKKKKKK exchange_rate=',response.quotes.USDEUR);
+                return response.quotes.USDEUR;
+            })
+            .then(exchange_rate => {
+                console.log('TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT exchange_rate=',exchange_rate);
+                let total = 0;
+                let subtotal = 0;
+                let itemsArray = items.split(',').map(s => s.trim()); // from string to clean array of strings
+                let discountPerItem = 0;
+                let discountsReport = "";
+                let totalDiscount = 0;
 
-    // transform the input string into a map
-    let itemsMap = new Map();
-    for (item of itemsArray){
-        if (itemsMap.get(item)){
-            itemsMap.set(item,itemsMap.get(item)+1);
-        } else {
-            itemsMap.set(item,1);
-        }
-    }
+                // transform the input string into a map
+                let itemsMap = new Map();
+                for (item of itemsArray){
+                    if (itemsMap.get(item)){
+                        itemsMap.set(item,itemsMap.get(item)+1);
+                    } else {
+                        itemsMap.set(item,1);
+                    }
+                }
 
-    itemsMap.forEach((ordered_qty,item) => {
-        if (unitPrice[item]){ // for each VALID product in the basket
-            discountPerItem = calculate_discount(item,ordered_qty);
-            if (discountPerItem>0){
-                discountsReport += " " + item + ":" + specialOffers[item].discount_qty + " >>> "  + specialOffers[item].discount_amt + ";";
-            }
-            subtotal += ordered_qty * unitPrice[item];
-            totalDiscount += discountPerItem;
-        }
+                itemsMap.forEach((ordered_qty,item) => {
+                    if (unitPrice[item]){ // for each VALID product in the basket
+                        discountPerItem = calculate_discount(item,ordered_qty);
+                        if (discountPerItem>0){
+                            discountsReport += " " + item + ":" + specialOffers[item].discount_qty + " >>> "  + specialOffers[item].discount_amt + ";";
+                        }
+                        subtotal += ordered_qty * unitPrice[item];
+                        totalDiscount += discountPerItem;
+                    }
+                });
+
+                total += subtotal - totalDiscount;
+
+                resolve({
+                    subtotal: subtotal * exchange_rate,
+                    discounts: discountsReport ,
+                    discountAmt: totalDiscount * exchange_rate,
+                    total:total * exchange_rate,
+                    currency: currency
+                })
+            })
+        .catch(err => {
+            console.log('ERRRRRRR:',err)
+        })
     });
 
-    total += subtotal - totalDiscount;
 
-    return {
-        subtotal: subtotal * exchange_rate,
-        discounts: discountsReport ,
-        discountAmt: totalDiscount * exchange_rate,
-        total:total * exchange_rate,
-        currency: currency
-    }
 };
 
 exports.list_products = (req,res) => {
@@ -106,8 +125,10 @@ exports.list_currencies = (req,res) => {
 exports.calculate_basket = function(req,res){
     return new Promise((resolve,reject) => {
         if (req.query.items && req.query.currency && currency_list[req.query.currency]) {
-            let my_basket = calculator(req.query.items, req.query.currency);
-            resolve(res.status(200).json(my_basket));
+            calculator(req.query.items, req.query.currency)
+                .then(my_basket => {
+                    resolve (res.status(200).json(my_basket));
+                });
         }
         else {
             reject(res.status(400).json({msg: "Bad Request"}));

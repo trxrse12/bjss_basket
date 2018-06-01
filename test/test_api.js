@@ -26,7 +26,7 @@ const specialOffers = {
         discount_amt: "10%"} // 10%
 };
 
-const currency = 2;
+const currency = 0.857204;
 
 context('\n\n\n\n\n\n\n\n ===>>>: TESTING THE Basket API:',function(){
         describe('\n\n CONTEXT 1: When hit by API request (GET /products), the Basket API: ', function() {
